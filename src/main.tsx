@@ -1,10 +1,29 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { RouterProvider } from 'react-router-dom'
+import { Toaster } from 'sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { router } from '@/router'
 import './index.css'
-import App from '@/App'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <RouterProvider router={router} />
+        <Toaster position="bottom-right" richColors />
+      </TooltipProvider>
+    </QueryClientProvider>
   </StrictMode>,
 )
