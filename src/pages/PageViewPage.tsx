@@ -1,11 +1,34 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import type { JSONContent } from '@tiptap/react'
 import { ArrowLeft, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { usePage, useDeletePage } from '@/hooks/usePages'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DeleteConfirmDialog } from '@/components/ui/DeleteConfirmDialog'
+import { ContentRenderer } from '@/components/editor/ContentRenderer'
+
+function PageContent({ content }: { content: string | null }) {
+  const parsed = useMemo<JSONContent | null>(() => {
+    if (!content) return null
+    try {
+      return JSON.parse(content) as JSONContent
+    } catch {
+      return null
+    }
+  }, [content])
+
+  if (!parsed) {
+    return (
+      <p className="text-muted-foreground text-sm">
+        Esta pagina ainda nao tem conteudo.
+      </p>
+    )
+  }
+
+  return <ContentRenderer content={parsed} />
+}
 
 export function PageViewPage() {
   const { pageId } = useParams<{ pageId: string }>()
@@ -78,15 +101,7 @@ export function PageViewPage() {
         <p className="text-muted-foreground mb-6 line-clamp-2">{page.description}</p>
       )}
 
-      <div className="prose max-w-none">
-        {page.content ? (
-          <pre className="whitespace-pre-wrap text-sm bg-muted p-4 rounded-lg">
-            {page.content}
-          </pre>
-        ) : (
-          <p className="text-muted-foreground text-sm">Esta pagina ainda nao tem conteudo.</p>
-        )}
-      </div>
+      <PageContent content={page.content} />
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}
