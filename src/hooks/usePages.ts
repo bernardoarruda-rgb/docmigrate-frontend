@@ -5,7 +5,10 @@ import type { CreatePageRequest, UpdatePageRequest } from '@/types/page'
 export function usePages(spaceId: number) {
   return useQuery({
     queryKey: pageKeys.lists(spaceId),
-    queryFn: () => pageService.getAll(spaceId),
+    queryFn: async () => {
+      const result = await pageService.getAll(spaceId)
+      return result.items
+    },
     enabled: spaceId > 0,
   })
 }
@@ -46,6 +49,48 @@ export function useDeletePage() {
     mutationFn: (id: number) => pageService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: pageKeys.all })
+    },
+  })
+}
+
+export function useReorderPages() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ spaceId, items }: { spaceId: number; items: Array<{ pageId: number; sortOrder: number }> }) =>
+      pageService.reorder(spaceId, items),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: pageKeys.lists(variables.spaceId) })
+    },
+  })
+}
+
+export function usePageLockStatus(pageId: number) {
+  return useQuery({
+    queryKey: [...pageKeys.detail(pageId), 'lock'],
+    queryFn: () => pageService.getLockStatus(pageId),
+    enabled: pageId > 0,
+  })
+}
+
+export function useAcquirePageLock() {
+  return useMutation({
+    mutationFn: (pageId: number) => pageService.acquireLock(pageId),
+  })
+}
+
+export function useReleasePageLock() {
+  return useMutation({
+    mutationFn: (pageId: number) => pageService.releaseLock(pageId),
+  })
+}
+
+export function useAutosavePage() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ pageId, content }: { pageId: number; content: string }) =>
+      pageService.autosave(pageId, content),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: pageKeys.detail(variables.pageId) })
     },
   })
 }

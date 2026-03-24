@@ -1,73 +1,83 @@
-# React + TypeScript + Vite
+# DocMigrate Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface da plataforma de documentacao modular DocMigrate.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 19 + TypeScript
+- Vite 7
+- Tailwind CSS V4
+- shadcn/ui
+- React Query (@tanstack/react-query)
+- React Hook Form + Zod
+- Tiptap v3 (editor rico)
+- React Router v7
 
-## React Compiler
+## Pre-requisitos
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 22+
+- API backend rodando em `http://localhost:5029`
 
-## Expanding the ESLint configuration
+## Setup
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Instalar dependencias:
+   ```bash
+   npm install
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2. Configurar variaveis de ambiente:
+   ```bash
+   cp .env.example .env
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3. Iniciar dev server:
+   ```bash
+   npm run dev
+   ```
+   App disponivel em: `http://localhost:3000`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Comandos
+
+| Comando | Descricao |
+|---------|-----------|
+| `npm run dev` | Dev server com HMR |
+| `npm run build` | Build de producao |
+| `npm run preview` | Preview do build |
+| `npx tsc --noEmit` | Type check |
+
+## Estrutura
+
+```
+src/
+├── components/       # Componentes reutilizaveis
+│   ├── ui/           # shadcn/ui + custom
+│   ├── editor/       # Tiptap editor
+│   ├── layout/       # Header, Sidebar
+│   ├── spaces/       # Cards e dialogs de espacos
+│   ├── pages/        # Cards e dialogs de paginas
+│   ├── settings/     # Painel de configuracoes
+│   ├── export/       # Export PDF/DOCX
+│   ├── import/       # Import HTML/MD/DOCX
+│   └── site/         # Visualizacao publica
+├── pages/            # Paginas (composicao apenas)
+├── layouts/          # Layout wrappers
+├── hooks/            # Custom hooks (React Query)
+├── services/         # API calls
+├── contexts/         # Auth, Theme
+├── types/            # TypeScript interfaces
+├── schemas/          # Zod schemas
+├── config/           # Constantes, endpoints
+└── lib/              # Utilidades
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Modos de Operacao
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Standalone** (dev): Layout completo com sidebar + header
+- **Iframe** (producao): Layout minimo, embarcado no BMS Core
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Convencoes
+
+- Codigo em ingles, UI em portugues (PT-BR)
+- Path alias: `@/` → `./src/`
+- TypeScript strict (sem `any`)
+- Texto dinamico sempre com `truncate` ou `line-clamp-N`

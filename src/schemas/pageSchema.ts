@@ -11,6 +11,20 @@ export const pageSchema = z.object({
     .max(FIELD_LIMITS.DESCRIPTION_MAX, `Descricao deve ter no maximo ${FIELD_LIMITS.DESCRIPTION_MAX} caracteres`)
     .optional()
     .or(z.literal('')),
+  icon: z.string().max(500).nullable().optional(),
+  iconColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Formato invalido (#RRGGBB)')
+    .nullable()
+    .optional()
+    .or(z.literal('')),
+  backgroundColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Formato invalido (#RRGGBB)')
+    .nullable()
+    .optional()
+    .or(z.literal('')),
+  language: z.string().optional(),
   sortOrder: z
     .number({ error: 'Ordem deve ser um numero' })
     .int('Ordem deve ser um numero inteiro')

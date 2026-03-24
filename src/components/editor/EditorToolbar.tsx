@@ -23,11 +23,25 @@ import {
   Link,
   Undo2,
   Redo2,
+  LayoutGrid,
+  Settings,
+  FileUp,
 } from 'lucide-react'
 import { LinkDialog } from './LinkDialog'
+import { ToolbarColorPicker } from './ToolbarColorPicker'
+import { ToolbarBlockColorPicker } from './ToolbarBlockColorPicker'
+import { ImportFileDialog } from '@/components/import/ImportFileDialog'
+import { ExportMenu } from '@/components/export/ExportMenu'
+import type { ImportResult } from '@/lib/importUtils'
 
 interface EditorToolbarProps {
   editor: Editor
+  pageTitle?: string
+  pageContent?: string | null
+  blockPanelOpen?: boolean
+  propertiesPanelOpen?: boolean
+  onToggleBlockPanel?: () => void
+  onTogglePropertiesPanel?: () => void
 }
 
 interface ToolbarButtonProps {
@@ -62,11 +76,16 @@ function ToolbarButton({
   )
 }
 
-function EditorToolbar({ editor }: EditorToolbarProps) {
+function EditorToolbar({ editor, pageTitle, pageContent, blockPanelOpen, propertiesPanelOpen, onToggleBlockPanel, onTogglePropertiesPanel }: EditorToolbarProps) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
+
+  const handleImportInsert = (result: ImportResult) => {
+    editor.commands.insertContent(result.content)
+  }
 
   return (
-    <div className="flex items-center gap-1 flex-wrap border border-border bg-muted/30 p-1.5 rounded-t-lg">
+    <div className="flex items-center gap-1 flex-wrap border border-border bg-muted/30 p-1.5 rounded-tl-lg shrink-0">
       {/* Formatacao de texto */}
       <ToolbarButton
         editor={editor}
@@ -96,6 +115,9 @@ function EditorToolbar({ editor }: EditorToolbarProps) {
         onToggle={() => editor.chain().focus().toggleStrike().run()}
         icon={<Strikethrough className="h-4 w-4" />}
       />
+      <ToolbarColorPicker editor={editor} type="textColor" />
+      <ToolbarColorPicker editor={editor} type="highlight" />
+      <ToolbarBlockColorPicker editor={editor} />
 
       <Separator orientation="vertical" className="h-6" />
 
@@ -212,6 +234,60 @@ function EditorToolbar({ editor }: EditorToolbarProps) {
         onToggle={() => editor.chain().focus().redo().run()}
         icon={<Redo2 className="h-4 w-4" />}
       />
+
+      <Separator orientation="vertical" className="h-6" />
+
+      {/* Importar */}
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Toggle
+              size="sm"
+              pressed={false}
+              onPressedChange={() => setImportDialogOpen(true)}
+            >
+              <FileUp className="h-4 w-4" />
+            </Toggle>
+          }
+        />
+        <TooltipContent>Importar arquivo</TooltipContent>
+      </Tooltip>
+
+      <ImportFileDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+        mode="insert"
+        onContentInsert={handleImportInsert}
+      />
+
+      {pageTitle && (
+        <ExportMenu
+          title={pageTitle}
+          content={pageContent ?? null}
+          variant="ghost"
+          size="sm"
+        />
+      )}
+
+      <Separator orientation="vertical" className="h-6" />
+      {onToggleBlockPanel && (
+        <ToolbarButton
+          editor={editor}
+          tooltip="Painel de blocos"
+          isActive={!!blockPanelOpen}
+          onToggle={onToggleBlockPanel}
+          icon={<LayoutGrid className="h-4 w-4" />}
+        />
+      )}
+      {onTogglePropertiesPanel && (
+        <ToolbarButton
+          editor={editor}
+          tooltip="Propriedades"
+          isActive={!!propertiesPanelOpen}
+          onToggle={onTogglePropertiesPanel}
+          icon={<Settings className="h-4 w-4" />}
+        />
+      )}
     </div>
   )
 }

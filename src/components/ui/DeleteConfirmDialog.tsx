@@ -33,7 +33,7 @@ export function DeleteConfirmDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending} autoFocus>
             Cancelar
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isPending}>

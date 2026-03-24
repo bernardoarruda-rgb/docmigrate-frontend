@@ -11,6 +11,19 @@ export const spaceSchema = z.object({
     .max(FIELD_LIMITS.DESCRIPTION_MAX, `Descricao deve ter no maximo ${FIELD_LIMITS.DESCRIPTION_MAX} caracteres`)
     .optional()
     .or(z.literal('')),
+  icon: z.string().max(500).nullable().optional(),
+  iconColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Formato invalido (#RRGGBB)')
+    .nullable()
+    .optional()
+    .or(z.literal('')),
+  backgroundColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Formato invalido (#RRGGBB)')
+    .nullable()
+    .optional()
+    .or(z.literal('')),
 })
 
 export type SpaceFormData = z.infer<typeof spaceSchema>

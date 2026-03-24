@@ -1,6 +1,6 @@
 .ProseMirror {
-  min-height: 400px;
-  padding: 1rem;
+  min-height: max(200px, 100%);
+  padding: 1.5rem 2rem;
   outline: none;
 }
 
@@ -9,29 +9,32 @@
 }
 
 .ProseMirror h1 {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
   font-family: var(--font-heading);
 }
 
 .ProseMirror h2 {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: bold;
+  margin-top: 1.25rem;
   margin-bottom: 0.5rem;
   font-family: var(--font-heading);
 }
 
 .ProseMirror h3 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
   font-family: var(--font-heading);
 }
 
 .ProseMirror p {
-  margin-bottom: 0.75rem;
-  line-height: 1.625;
+  margin-bottom: 1rem;
+  line-height: 1.7;
 }
 
 .ProseMirror ul {
@@ -87,10 +90,123 @@
   cursor: pointer;
 }
 
+/* Button block: reset link styles so button variants render correctly */
+.ProseMirror [data-node-type="buttonBlock"] a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: inherit;
+}
+
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   color: var(--color-muted-foreground);
   float: left;
   height: 0;
   pointer-events: none;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+}
+
+.ProseMirror [data-type="callout"] p:last-child {
+  margin-bottom: 0;
+}
+
+/* Columns layout */
+.ProseMirror .columns-layout {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.ProseMirror .columns-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.ProseMirror .columns-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.ProseMirror .columns-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.ProseMirror .column-item {
+  border: 1px dashed var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  min-height: 3rem;
+}
+
+.ProseMirror[contenteditable="false"] .column-item {
+  border-color: transparent;
+  padding: 0;
+}
+
+/* Accordion */
+.ProseMirror .accordion-wrapper {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+/* Section inner content */
+.ProseMirror [data-type="section"] p:last-child {
+  margin-bottom: 0;
+}
+
+/* Section grid mode — content wrapper inherits grid */
+.ProseMirror [data-type="section"] .section-grid-content {
+  display: contents;
+}
+
+/* Grid children visual hint in edit mode */
+.ProseMirror[contenteditable="true"] [data-type="section"][data-layout="grid"] > div > .section-grid-content > * {
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  border-radius: 4px;
+  min-height: 2rem;
+}
+
+/* Card inner content */
+.ProseMirror [data-type="card-block"] p:last-child {
+  margin-bottom: 0;
+}
+
+/* Drag Handle */
+.drag-handle {
+  position: absolute;
+  left: 2px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: grab;
+  color: var(--color-muted-foreground);
+  opacity: 0.5;
+  transition: opacity 0.15s, background-color 0.15s;
+  z-index: 50;
+  user-select: none;
+}
+
+.drag-handle:hover {
+  opacity: 1;
+  background-color: var(--color-accent);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Selected node highlight */
+.ProseMirror .ProseMirror-selectednode {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

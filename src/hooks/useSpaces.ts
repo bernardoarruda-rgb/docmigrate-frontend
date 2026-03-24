@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { spaceService, spaceKeys } from '@/services/spaceService'
 import type { CreateSpaceRequest, UpdateSpaceRequest } from '@/types/space'
 
-export function useSpaces() {
+export function useSpaces(page = 1, pageSize = 20) {
   return useQuery({
-    queryKey: spaceKeys.lists(),
-    queryFn: spaceService.getAll,
+    queryKey: [...spaceKeys.lists(), page, pageSize],
+    queryFn: () => spaceService.getAll(page, pageSize),
   })
 }
 

@@ -1,0 +1,8 @@
+export const SEARCH_CONFIG = {
+  DEBOUNCE_DELAY: 300,
+  MIN_QUERY_LENGTH: 2,
+  MAX_RECENT_SEARCHES: 5,
+  RECENT_SEARCHES_KEY: 'docmigrate:recent-searches',
+  SNIPPET_MAX_LENGTH: 120,
+  MAX_VISIBLE_TAGS: 3,
+} as const
