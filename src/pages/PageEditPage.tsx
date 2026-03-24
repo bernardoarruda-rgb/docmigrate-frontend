@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import type { JSONContent } from '@tiptap/react'
 import { ArrowLeft, Loader2, Lock } from 'lucide-react'
 import { usePage } from '@/hooks/usePages'
@@ -12,14 +12,7 @@ import { RichTextEditor } from '@/components/editor/RichTextEditor'
 import { ENDPOINTS } from '@/config/endpoints'
 import { getToken } from '@/lib/authStore'
 import { apiClient } from '@/lib/apiClient'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+import { PageBreadcrumbs } from '@/components/ui/PageBreadcrumbs'
 
 export function PageEditPage() {
   const { spaceId, pageId } = useParams<{ spaceId: string; pageId: string }>()
@@ -163,31 +156,14 @@ export function PageEditPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-        <Breadcrumb>
-          <BreadcrumbList>
-            {space ? (
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to={`/spaces/${numSpaceId}`}>{space.title}</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            ) : (
-              <BreadcrumbItem>
-                <Skeleton className="h-4 w-20" />
-              </BreadcrumbItem>
-            )}
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to={`/spaces/${numSpaceId}/pages/${page.id}`}>{page.title}</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Editar</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <PageBreadcrumbs
+          spaceId={numSpaceId}
+          spaceName={space?.title}
+          breadcrumbs={page.breadcrumbs}
+          currentPageTitle={page.title}
+          showHome={false}
+          suffix="Editar"
+        />
         </div>
 
         <span className="text-sm text-muted-foreground flex items-center gap-1.5">

@@ -18,7 +18,7 @@ import { LANGUAGES } from '@/config/constants'
 import { IconPicker } from '@/components/ui/IconPicker'
 import { ColorPicker } from '@/components/editor/properties/ColorPicker'
 import { pageSchema } from '@/schemas/pageSchema'
-import { useCreatePage, useUpdatePage } from '@/hooks/usePages'
+import { useCreatePage, useUpdatePage, usePages } from '@/hooks/usePages'
 import { useSetPageTags } from '@/hooks/useTags'
 import { TagPicker } from '@/components/tags/TagPicker'
 import { TemplateSelector } from '@/components/editor/TemplateSelector'
@@ -29,6 +29,7 @@ interface PageFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   spaceId: number
+  parentPageId?: number | null
   page?: { id: number; title: string; description: string | null; sortOrder: number; icon: string | null; iconColor: string | null; backgroundColor: string | null; language?: string }
 }
 
@@ -36,6 +37,7 @@ export function PageFormDialog({
   open,
   onOpenChange,
   spaceId,
+  parentPageId,
   page,
 }: PageFormDialogProps) {
   const isEditing = !!page
@@ -43,10 +45,12 @@ export function PageFormDialog({
   const updateMutation = useUpdatePage()
   const setTagsMutation = useSetPageTags()
   const isPending = createMutation.isPending || updateMutation.isPending
+  const { data: availablePages } = usePages(spaceId)
 
   const [step, setStep] = useState<'template' | 'form'>('template')
   const [selectedTemplate, setSelectedTemplate] = useState<PageTemplate | null>(null)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
+  const [selectedParentPageId, setSelectedParentPageId] = useState<number | null>(null)
 
   const form = useForm<PageFormData>({
     resolver: zodResolver(pageSchema),
@@ -67,8 +71,9 @@ export function PageFormDialog({
       setStep(isEditing ? 'form' : 'template')
       setSelectedTemplate(null)
       setSelectedTagIds([])
+      setSelectedParentPageId(parentPageId ?? null)
     }
-  }, [open, page, form, isEditing])
+  }, [open, page, form, isEditing, parentPageId])
 
   const handleTemplateSelect = (template: PageTemplate) => {
     setSelectedTemplate(template)
@@ -92,7 +97,7 @@ export function PageFormDialog({
       updateMutation.mutate(
         {
           id: page.id,
-          data: { title: data.title, description, sortOrder: data.sortOrder, icon, iconColor, backgroundColor, language },
+          data: { title: data.title, description, sortOrder: data.sortOrder, icon, iconColor, backgroundColor, language, parentPageId: selectedParentPageId },
         },
         {
           onSuccess: () => {
@@ -119,6 +124,7 @@ export function PageFormDialog({
           iconColor,
           backgroundColor,
           language,
+          parentPageId: selectedParentPageId,
         },
         {
           onSuccess: (created) => {
@@ -170,6 +176,27 @@ export function PageFormDialog({
                 )}
               </div>
             )}
+            <div className="space-y-2">
+              <Label>Pagina pai (opcional)</Label>
+              <Select
+                value={selectedParentPageId?.toString() ?? 'root'}
+                onValueChange={(val) => setSelectedParentPageId(val === 'root' ? null : Number(val))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Raiz do espaco" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="root">Raiz do espaco</SelectItem>
+                  {(availablePages ?? [])
+                    .filter(p => p.level < 5 && p.id !== page?.id)
+                    .map(p => (
+                      <SelectItem key={p.id} value={p.id.toString()}>
+                        {'  '.repeat(p.level - 1)}{p.title}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="page-title">Titulo</Label>
               <Input

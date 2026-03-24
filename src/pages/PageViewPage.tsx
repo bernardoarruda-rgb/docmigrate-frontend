@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import type { JSONContent } from '@tiptap/react'
-import { Pencil, Home, History } from 'lucide-react'
+import { Pencil, History } from 'lucide-react'
 import { toast } from 'sonner'
 import { usePage, useAcquirePageLock } from '@/hooks/usePages'
 import { useRecordVisit } from '@/hooks/useUserActivity'
@@ -18,14 +18,7 @@ import { MetadataFooter } from '@/components/ui/MetadataFooter'
 import { ScrollToTop } from '@/components/ui/ScrollToTop'
 import { VersionHistoryPanel } from '@/components/pages/VersionHistoryPanel'
 import { CommentsSection } from '@/components/comments/CommentsSection'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+import { PageBreadcrumbs } from '@/components/ui/PageBreadcrumbs'
 import { LANGUAGES } from '@/config/constants'
 import { useTranslation, useGenerateTranslation } from '@/hooks/useTranslations'
 import { LanguageSelector } from '@/components/translations/LanguageSelector'
@@ -136,32 +129,13 @@ export function PageViewPage() {
   return (
     <div>
       {/* Breadcrumbs */}
-      <Breadcrumb className="mb-4">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/" className="flex items-center gap-1">
-                <Home className="h-3 w-3" />
-                Inicio
-              </Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            {space ? (
-              <BreadcrumbLink asChild>
-                <Link to={`/spaces/${numSpaceId}`}>{space.title}</Link>
-              </BreadcrumbLink>
-            ) : (
-              <Skeleton className="h-4 w-20" />
-            )}
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{page.title}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <PageBreadcrumbs
+        spaceId={numSpaceId}
+        spaceName={space?.title}
+        breadcrumbs={page.breadcrumbs}
+        currentPageTitle={page.title}
+        className="mb-4"
+      />
 
       {/* Page header */}
       <div className="flex items-start justify-between gap-4 mb-8">

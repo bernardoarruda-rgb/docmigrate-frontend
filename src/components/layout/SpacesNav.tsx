@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { ChevronRight, FileText, Settings, Plus, FolderOpen } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ChevronRight, Settings, Plus, FolderOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSpaces } from '@/hooks/useSpaces'
 import { usePermissions } from '@/hooks/usePermissions'
 import { IconRenderer } from '@/components/ui/IconRenderer'
 import { usePages } from '@/hooks/usePages'
 import { PageFormDialog } from '@/components/pages/PageFormDialog'
+import { buildPageTree } from '@/lib/buildPageTree'
+import { PageTreeItem } from '@/components/layout/PageTreeItem'
 import type { SpaceListItem } from '@/types/space'
 
 interface SpacesNavProps {
@@ -51,15 +53,18 @@ function SpaceItem({ space, autoExpand }: SpaceItemProps) {
   const { data: pages } = usePages(space.id)
   const { canEdit } = usePermissions()
   const navigate = useNavigate()
+  const location = useLocation()
   const [pageFormOpen, setPageFormOpen] = useState(false)
+  const [parentPageIdForCreate, setParentPageIdForCreate] = useState<number | null>(null)
 
   useEffect(() => {
     if (autoExpand) setExpanded(true)
   }, [autoExpand])
 
-  const sortedPages = pages
-    ? [...pages].sort((a, b) => a.sortOrder - b.sortOrder)
-    : []
+  const pageTree = pages ? buildPageTree([...pages].sort((a, b) => a.sortOrder - b.sortOrder)) : []
+
+  const pageIdMatch = location.pathname.match(/\/pages\/(\d+)/)
+  const activePageId = pageIdMatch ? Number(pageIdMatch[1]) : null
 
   return (
     <div>
@@ -112,28 +117,20 @@ function SpaceItem({ space, autoExpand }: SpaceItemProps) {
       {/* Pages */}
       {expanded && (
         <div className="ml-3 border-l border-sidebar-border pl-1.5 flex flex-col gap-0.5 mt-0.5">
-          {sortedPages.map((page) => (
-            <NavLink
-              key={page.id}
-              to={`/spaces/${space.id}/pages/${page.id}`}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors',
-                  isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                    : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground',
-                )
-              }
-            >
-              {page.icon ? (
-                <IconRenderer icon={page.icon} iconColor={page.iconColor} size={14} className="shrink-0" />
-              ) : (
-                <FileText className="h-3.5 w-3.5 shrink-0" />
-              )}
-              <span className="truncate">{page.title}</span>
-            </NavLink>
+          {pageTree.map((node) => (
+            <PageTreeItem
+              key={node.id}
+              node={node}
+              spaceId={space.id}
+              canEdit={canEdit}
+              onCreateSubPage={(parentId) => {
+                setParentPageIdForCreate(parentId)
+                setPageFormOpen(true)
+              }}
+              activePageId={activePageId}
+            />
           ))}
-          {sortedPages.length === 0 && (
+          {pageTree.length === 0 && (
             <p className="px-2 py-1 text-xs text-sidebar-foreground/40">
               Sem paginas
             </p>
@@ -143,8 +140,12 @@ function SpaceItem({ space, autoExpand }: SpaceItemProps) {
 
       <PageFormDialog
         open={pageFormOpen}
-        onOpenChange={setPageFormOpen}
+        onOpenChange={(open) => {
+          setPageFormOpen(open)
+          if (!open) setParentPageIdForCreate(null)
+        }}
         spaceId={space.id}
+        parentPageId={parentPageIdForCreate}
       />
     </div>
   )

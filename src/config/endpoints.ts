@@ -8,6 +8,7 @@ export const ENDPOINTS = {
   PAGES_LOCK: (pageId: number) => `${API_BASE_URL}/api/pages/${pageId}/lock`,
   PAGES_LOCK_STATUS: (pageId: number) => `${API_BASE_URL}/api/pages/${pageId}/lock-status`,
   PAGES_AUTOSAVE: (pageId: number) => `${API_BASE_URL}/api/pages/${pageId}/autosave`,
+  PAGES_BREADCRUMBS: (pageId: number) => `${API_BASE_URL}/api/pages/${pageId}/breadcrumbs`,
   TEMPLATES: `${API_BASE_URL}/api/templates`,
   FILES_ICONS: `${API_BASE_URL}/api/files/icons`,
   FILES_IMAGES: `${API_BASE_URL}/api/files/images`,

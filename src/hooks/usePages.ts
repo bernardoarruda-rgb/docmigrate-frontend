@@ -94,3 +94,11 @@ export function useAutosavePage() {
     },
   })
 }
+
+export function usePageBreadcrumbs(pageId: number) {
+  return useQuery({
+    queryKey: [...pageKeys.detail(pageId), 'breadcrumbs'],
+    queryFn: () => pageService.getBreadcrumbs(pageId),
+    enabled: pageId > 0,
+  })
+}

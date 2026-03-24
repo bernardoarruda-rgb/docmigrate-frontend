@@ -8,6 +8,9 @@ export interface PageListItem {
   sortOrder: number
   language: string
   spaceId: number
+  parentPageId: number | null
+  level: number
+  hasChildren: boolean
   createdAt: string
 }
 
@@ -21,6 +24,9 @@ export interface PageResponse {
   content: string | null
   sortOrder: number
   spaceId: number
+  parentPageId: number | null
+  level: number
+  breadcrumbs: BreadcrumbItem[]
   lockedBy: string | null
   lockedAt: string | null
   language: string
@@ -45,6 +51,7 @@ export interface CreatePageRequest {
   language?: string
   sortOrder: number
   spaceId: number
+  parentPageId?: number | null
 }
 
 export interface UpdatePageRequest {
@@ -56,4 +63,10 @@ export interface UpdatePageRequest {
   content?: string | null
   language?: string
   sortOrder: number
+  parentPageId?: number | null
+}
+
+export interface BreadcrumbItem {
+  id: number
+  title: string
 }

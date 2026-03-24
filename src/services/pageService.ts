@@ -1,6 +1,6 @@
 import { apiClient } from '@/lib/apiClient'
 import { ENDPOINTS } from '@/config/endpoints'
-import type { PageListItem, PageResponse, PageLockStatus, CreatePageRequest, UpdatePageRequest } from '@/types/page'
+import type { PageListItem, PageResponse, PageLockStatus, CreatePageRequest, UpdatePageRequest, BreadcrumbItem } from '@/types/page'
 import type { PaginatedResponse } from '@/types/api'
 
 export const pageKeys = {
@@ -29,4 +29,6 @@ export const pageService = {
     apiClient.get<PageLockStatus>(ENDPOINTS.PAGES_LOCK_STATUS(pageId)),
   autosave: (pageId: number, content: string) =>
     apiClient.patch<void>(ENDPOINTS.PAGES_AUTOSAVE(pageId), { content }),
+  getBreadcrumbs: (pageId: number) =>
+    apiClient.get<BreadcrumbItem[]>(ENDPOINTS.PAGES_BREADCRUMBS(pageId)),
 }

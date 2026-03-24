@@ -25,6 +25,7 @@ export const pageSchema = z.object({
     .optional()
     .or(z.literal('')),
   language: z.string().optional(),
+  parentPageId: z.number().int().positive().nullable().optional(),
   sortOrder: z
     .number({ error: 'Ordem deve ser um numero' })
     .int('Ordem deve ser um numero inteiro')
