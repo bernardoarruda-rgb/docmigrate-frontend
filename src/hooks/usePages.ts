@@ -95,6 +95,30 @@ export function useAutosavePage() {
   })
 }
 
+export function useDuplicatePage() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (pageId: number) => {
+      const original = await pageService.getById(pageId)
+      return pageService.create({
+        title: `${original.title} (copia)`,
+        description: original.description,
+        icon: original.icon,
+        iconColor: original.iconColor,
+        backgroundColor: original.backgroundColor,
+        content: original.content,
+        language: original.language,
+        sortOrder: original.sortOrder + 1,
+        spaceId: original.spaceId,
+        parentPageId: original.parentPageId,
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: pageKeys.all })
+    },
+  })
+}
+
 export function usePageBreadcrumbs(pageId: number) {
   return useQuery({
     queryKey: [...pageKeys.detail(pageId), 'breadcrumbs'],

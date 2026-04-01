@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -60,14 +61,16 @@ function ExportMenu({ title, content, variant = 'outline', size = 'sm' }: Export
         }
       />
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Exportar como</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {FORMAT_OPTIONS.map(({ format, label, icon }) => (
-          <DropdownMenuItem key={format} onClick={() => handleExport(format)}>
-            {icon}
-            {label}
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Exportar como</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {FORMAT_OPTIONS.map(({ format, label, icon }) => (
+            <DropdownMenuItem key={format} onClick={() => handleExport(format)}>
+              {icon}
+              {label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

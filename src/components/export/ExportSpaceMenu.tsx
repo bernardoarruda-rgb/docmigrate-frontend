@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -75,14 +76,16 @@ function ExportSpaceMenu({ spaceId, spaceName }: ExportSpaceMenuProps) {
         }
       />
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Exportar espaco como</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {FORMAT_OPTIONS.map(({ format, label, icon }) => (
-          <DropdownMenuItem key={format} onClick={() => handleExport(format)}>
-            {icon}
-            {label}
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Exportar espaco como</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {FORMAT_OPTIONS.map(({ format, label, icon }) => (
+            <DropdownMenuItem key={format} onClick={() => handleExport(format)}>
+              {icon}
+              {label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

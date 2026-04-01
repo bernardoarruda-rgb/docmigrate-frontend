@@ -24,7 +24,7 @@ export const EDITOR = {
   PLACEHOLDER: 'Comece a escrever ou digite "/" para comandos...',
   MIN_HEIGHT: 400,
   HEADING_LEVELS: [1, 2, 3] as const,
-  SLASH_COMMAND_MAX_RESULTS: 10,
+  SLASH_COMMAND_MAX_RESULTS: 30,
 } as const
 
 export const AUTOSAVE = {

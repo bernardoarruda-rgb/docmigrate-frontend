@@ -21,6 +21,10 @@ import { CodeBlockViewExtension } from './CodeBlockViewExtension'
 import { DragHandleExtension } from './DragHandleExtension'
 import { PageMentionExtension } from './PageMentionExtension'
 import { HeadingRefExtension } from './HeadingRefExtension'
+import { Table } from '@tiptap/extension-table'
+import { TableRow } from '@tiptap/extension-table-row'
+import { TableCell } from '@tiptap/extension-table-cell'
+import { TableHeader } from '@tiptap/extension-table-header'
 import { EDITOR } from '@/config/constants'
 import type { Extensions } from '@tiptap/react'
 
@@ -46,7 +50,15 @@ export function getEditorExtensions(): Extensions {
       },
     }),
     Placeholder.configure({
-      placeholder: EDITOR.PLACEHOLDER,
+      placeholder: ({ node }) => {
+        if (node.type.name === 'heading') {
+          const level = node.attrs.level as number
+          if (level === 1) return 'Titulo'
+          if (level === 2) return 'Subtitulo'
+          return 'Secao'
+        }
+        return EDITOR.PLACEHOLDER
+      },
     }),
     ImageExtension.configure({
       inline: false,
@@ -70,6 +82,15 @@ export function getEditorExtensions(): Extensions {
     DragHandleExtension,
     PageMentionExtension,
     HeadingRefExtension,
+    Table.configure({
+      resizable: false,
+      HTMLAttributes: {
+        class: 'border-collapse w-full',
+      },
+    }),
+    TableRow,
+    TableCell,
+    TableHeader,
     SlashCommandExtension,
   ]
 }

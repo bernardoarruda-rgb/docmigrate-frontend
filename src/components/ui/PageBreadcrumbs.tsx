@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
 interface PageBreadcrumbsProps {
   spaceId: number
   spaceName?: string
-  breadcrumbs: BreadcrumbItem[]
+  breadcrumbs?: BreadcrumbItem[]
   currentPageTitle: string
   showHome?: boolean
   suffix?: string
@@ -33,7 +33,7 @@ export function PageBreadcrumbs({
 }: PageBreadcrumbsProps) {
   // All breadcrumb items except the last one are ancestors (clickable links).
   // The last item is the current page (non-clickable).
-  const ancestors = breadcrumbs.slice(0, -1)
+  const ancestors = (breadcrumbs ?? []).slice(0, -1)
 
   return (
     <Breadcrumb className={cn(className)}>
@@ -78,7 +78,7 @@ export function PageBreadcrumbs({
         <BreadcrumbItemPrimitive>
           {suffix ? (
             <BreadcrumbLink asChild>
-              <Link to={`/spaces/${spaceId}/pages/${breadcrumbs[breadcrumbs.length - 1]?.id ?? 0}`}>
+              <Link to={`/spaces/${spaceId}/pages/${(breadcrumbs ?? [])[( breadcrumbs ?? []).length - 1]?.id ?? 0}`}>
                 {currentPageTitle}
               </Link>
             </BreadcrumbLink>

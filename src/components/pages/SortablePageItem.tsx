@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Link } from 'react-router-dom'
-import { GripVertical, MoreHorizontal, Pencil, Eye, Trash2 } from 'lucide-react'
+import { GripVertical, MoreHorizontal, Pencil, Eye, Trash2, Copy } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +12,10 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { IconRenderer } from '@/components/ui/IconRenderer'
+import { FavoriteButton } from '@/components/ui/FavoriteButton'
+import { formatRelativeDate } from '@/lib/formatDate'
+import { useDuplicatePage } from '@/hooks/usePages'
+import { toast } from 'sonner'
 import type { PageListItem } from '@/types/page'
 
 interface SortablePageItemProps {
@@ -22,6 +26,15 @@ interface SortablePageItemProps {
 }
 
 export function SortablePageItem({ page, onView, onEdit, onDelete }: SortablePageItemProps) {
+  const duplicatePage = useDuplicatePage()
+
+  const handleDuplicate = () => {
+    duplicatePage.mutate(page.id, {
+      onSuccess: () => toast.success('Pagina duplicada com sucesso'),
+      onError: () => toast.error('Erro ao duplicar pagina'),
+    })
+  }
+
   const {
     attributes,
     listeners,
@@ -72,12 +85,18 @@ export function SortablePageItem({ page, onView, onEdit, onDelete }: SortablePag
                   <CardTitle className="text-base truncate cursor-pointer hover:text-primary transition-colors">
                     {page.title}
                   </CardTitle>
-                  {page.description && (
-                    <CardDescription className="line-clamp-1 text-xs">{page.description}</CardDescription>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {page.description && (
+                      <CardDescription className="line-clamp-1 text-xs">{page.description}</CardDescription>
+                    )}
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      {formatRelativeDate(page.createdAt)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </Link>
+            <FavoriteButton pageId={page.id} className="shrink-0" />
             <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
               <Button variant="ghost" size="icon-xs" onClick={() => onView(page)} aria-label="Visualizar">
                 <Eye className="h-3.5 w-3.5" />
@@ -107,6 +126,10 @@ export function SortablePageItem({ page, onView, onEdit, onDelete }: SortablePag
                         Editar
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={handleDuplicate}>
+                      <Copy className="h-4 w-4" />
+                      Duplicar
+                    </DropdownMenuItem>
                     {onDelete && (
                       <>
                         <DropdownMenuSeparator />

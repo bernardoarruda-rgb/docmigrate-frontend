@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Plus, Pencil, Trash2, FileUp, MoreHorizontal, Home } from 'lucide-react'
+import { Plus, Pencil, Trash2, FileUp, MoreHorizontal, Home, LayoutGrid, List, FolderPlus } from 'lucide-react'
 import { toast } from 'sonner'
 import { useSpace, useDeleteSpace } from '@/hooks/useSpaces'
 import { usePages, useDeletePage, useCreatePage } from '@/hooks/usePages'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SortablePageList } from '@/components/pages/SortablePageList'
+import { PageGridItem } from '@/components/pages/PageGridItem'
 import { PageFormDialog } from '@/components/pages/PageFormDialog'
 import { SpaceFormDialog } from '@/components/spaces/SpaceFormDialog'
 import { DeleteConfirmDialog } from '@/components/ui/DeleteConfirmDialog'
+import { FolderFormDialog } from '@/components/folders/FolderFormDialog'
 import { ImportFileDialog } from '@/components/import/ImportFileDialog'
 import { ExportSpaceMenu } from '@/components/export/ExportSpaceMenu'
 import { MetadataFooter } from '@/components/ui/MetadataFooter'
@@ -52,6 +54,15 @@ export function SpaceDetailPage() {
   const [pageDeleteDialogOpen, setPageDeleteDialogOpen] = useState(false)
   const [deletingPage, setDeletingPage] = useState<PageListItem | undefined>(undefined)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [folderFormOpen, setFolderFormOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => {
+    return (localStorage.getItem('docmigrate:page-view-mode') as 'list' | 'grid') || 'list'
+  })
+
+  const handleViewModeChange = (mode: 'list' | 'grid') => {
+    setViewMode(mode)
+    localStorage.setItem('docmigrate:page-view-mode', mode)
+  }
 
   const handleDeleteSpace = () => {
     deleteSpaceMutation.mutate(id, {
@@ -197,14 +208,34 @@ export function SpaceDetailPage() {
       />
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <h3 className="text-xl font-semibold">
-          Paginas
-          {pages && pages.length > 0 && (
-            <span className="text-sm font-normal text-muted-foreground ml-2">
-              ({pages.length})
-            </span>
-          )}
-        </h3>
+        <div className="flex items-center gap-3">
+          <h3 className="text-xl font-semibold">
+            Paginas
+            {pages && pages.length > 0 && (
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({pages.length})
+              </span>
+            )}
+          </h3>
+          <div className="flex items-center border border-border rounded-md">
+            <Button
+              variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+              size="icon-xs"
+              onClick={() => handleViewModeChange('list')}
+              aria-label="Visualizacao em lista"
+            >
+              <List className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+              size="icon-xs"
+              onClick={() => handleViewModeChange('grid')}
+              aria-label="Visualizacao em grade"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
         <div className="flex items-center gap-2 flex-wrap">
           <ExportSpaceMenu spaceId={id} spaceName={space.title} />
           {canEdit && (
@@ -212,6 +243,10 @@ export function SpaceDetailPage() {
               <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)}>
                 <FileUp className="h-4 w-4" />
                 <span className="hidden sm:inline">Importar</span>
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setFolderFormOpen(true)}>
+                <FolderPlus className="h-4 w-4" />
+                <span className="hidden sm:inline">Nova pasta</span>
               </Button>
               <Button size="sm" onClick={handleNewPage}>
                 <Plus className="h-4 w-4" />
@@ -234,7 +269,7 @@ export function SpaceDetailPage() {
         </div>
       )}
 
-      {pages && pages.length > 0 && (
+      {pages && pages.length > 0 && viewMode === 'list' && (
         <SortablePageList
           pages={pages}
           spaceId={id}
@@ -242,6 +277,20 @@ export function SpaceDetailPage() {
           onEdit={canEdit ? handleEditPage : undefined}
           onDelete={canEdit ? handleDeletePage : undefined}
         />
+      )}
+
+      {pages && pages.length > 0 && viewMode === 'grid' && (
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {[...pages].sort((a, b) => a.sortOrder - b.sortOrder).map((page) => (
+            <PageGridItem
+              key={page.id}
+              page={page}
+              onView={(p) => navigate(`/spaces/${id}/pages/${p.id}`)}
+              onEdit={canEdit ? handleEditPage : undefined}
+              onDelete={canEdit ? handleDeletePage : undefined}
+            />
+          ))}
+        </div>
       )}
 
       <SpaceFormDialog
@@ -284,6 +333,12 @@ export function SpaceDetailPage() {
         onOpenChange={setImportDialogOpen}
         mode="create"
         onPageCreate={handleImportPage}
+      />
+
+      <FolderFormDialog
+        open={folderFormOpen}
+        onOpenChange={setFolderFormOpen}
+        spaceId={id}
       />
     </div>
   )

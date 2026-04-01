@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import type { JSONContent } from '@tiptap/react'
 import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
 import type { NodeViewProps } from '@tiptap/react'
@@ -222,11 +222,38 @@ function ContentRenderer({ content }: ContentRendererProps) {
     editor.commands.setContent(content)
   }, [editor, content])
 
+  // Strip target="_blank" from anchor links so click handler works
+  useEffect(() => {
+    if (!editor) return
+    // Small delay to let Tiptap finish rendering decorations
+    const timer = setTimeout(() => {
+      const el = editor.view.dom
+      el.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.removeAttribute('target')
+      })
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [editor, content])
+
   if (!editor) return null
+
+  // Intercept clicks on anchor links (#heading) to scroll instead of opening new tab
+  const handleContentClick = useCallback((e: React.MouseEvent) => {
+    const anchor = (e.target as HTMLElement).closest('a')
+    if (!anchor) return
+
+    const href = anchor.getAttribute('href')
+    if (href?.startsWith('#')) {
+      e.preventDefault()
+      e.stopPropagation()
+      const headingId = decodeURIComponent(href.slice(1))
+      scrollToAndHighlight(headingId)
+    }
+  }, [])
 
   return (
     <BrokenRefContext.Provider value={brokenRefState}>
-      <div className="prose max-w-none">
+      <div className="prose max-w-none" onClick={handleContentClick}>
         <EditorContent editor={editor} />
       </div>
     </BrokenRefContext.Provider>

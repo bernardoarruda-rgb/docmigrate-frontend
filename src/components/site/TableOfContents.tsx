@@ -60,6 +60,17 @@ function extractHeadings(content: string | null): TocHeading[] {
     }
 
     walk(doc)
+
+    // Handle duplicate slugs (append -1, -2, etc.) to match HeadingIdExtension behavior
+    const slugCount = new Map<string, number>()
+    for (const heading of headings) {
+      const count = slugCount.get(heading.id) ?? 0
+      if (count > 0) {
+        heading.id = `${heading.id}-${count}`
+      }
+      slugCount.set(heading.id.replace(/-\d+$/, ''), count + 1)
+    }
+
     return headings
   } catch {
     return []
@@ -104,7 +115,7 @@ export function TableOfContents({ content, scrollContainer }: TableOfContentsPro
   return (
     <nav
       className="sticky top-20 hidden xl:block shrink-0 overflow-y-auto"
-      style={{ width: SITE_LAYOUT.TOC_WIDTH }}
+      style={{ width: SITE_LAYOUT.TOC_WIDTH, maxHeight: 'calc(100vh - 6rem)' }}
     >
       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
         Nesta pagina

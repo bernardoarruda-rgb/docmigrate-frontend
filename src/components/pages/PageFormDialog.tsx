@@ -30,6 +30,7 @@ interface PageFormDialogProps {
   onOpenChange: (open: boolean) => void
   spaceId: number
   parentPageId?: number | null
+  folderId?: number | null
   page?: { id: number; title: string; description: string | null; sortOrder: number; icon: string | null; iconColor: string | null; backgroundColor: string | null; language?: string }
 }
 
@@ -38,6 +39,7 @@ export function PageFormDialog({
   onOpenChange,
   spaceId,
   parentPageId,
+  folderId,
   page,
 }: PageFormDialogProps) {
   const isEditing = !!page
@@ -125,6 +127,7 @@ export function PageFormDialog({
           backgroundColor,
           language,
           parentPageId: selectedParentPageId,
+          folderId: folderId ?? null,
         },
         {
           onSuccess: (created) => {

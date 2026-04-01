@@ -204,6 +204,40 @@
   cursor: grabbing;
 }
 
+/* Tables */
+.ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-border);
+}
+
+.ProseMirror table td,
+.ProseMirror table th {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  min-width: 80px;
+  position: relative;
+}
+
+.ProseMirror table th {
+  background-color: var(--color-muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.ProseMirror table td > p,
+.ProseMirror table th > p {
+  margin-bottom: 0;
+}
+
+.ProseMirror table tr:nth-child(even) td {
+  background-color: color-mix(in srgb, var(--color-muted) 30%, transparent);
+}
+
 /* Selected node highlight */
 .ProseMirror .ProseMirror-selectednode {
   outline: 2px solid var(--color-primary);

@@ -12,6 +12,7 @@ const PageEditPage = lazy(() => import('@/pages/PageEditPage').then(m => ({ defa
 const TemplateListPage = lazy(() => import('@/pages/TemplateListPage').then(m => ({ default: m.TemplateListPage })))
 const TagListPage = lazy(() => import('@/pages/TagListPage').then(m => ({ default: m.TagListPage })))
 const TranslationEditorPage = lazy(() => import('@/pages/TranslationEditorPage').then(m => ({ default: m.TranslationEditorPage })))
+const FolderPreviewPage = lazy(() => import('@/pages/FolderPreviewPage').then(m => ({ default: m.FolderPreviewPage })))
 
 function PageFallback() {
   return (
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Suspense fallback={<PageFallback />}><SpaceHubPage /></Suspense> },
       { path: 'spaces/:spaceId', element: <Suspense fallback={<PageFallback />}><SpaceDetailPage /></Suspense> },
+      { path: 'spaces/:spaceId/folders/:folderId', element: <Suspense fallback={<PageFallback />}><FolderPreviewPage /></Suspense> },
       { path: 'spaces/:spaceId/pages/:pageId', element: <Suspense fallback={<PageFallback />}><PageViewPage /></Suspense> },
       { path: 'spaces/:spaceId/pages/:pageId/edit', element: <EditorRoute><Suspense fallback={<PageFallback />}><PageEditPage /></Suspense></EditorRoute> },
       { path: 'spaces/:spaceId/pages/:pageId/translate/:lang', element: <EditorRoute><Suspense fallback={<PageFallback />}><TranslationEditorPage /></Suspense></EditorRoute> },

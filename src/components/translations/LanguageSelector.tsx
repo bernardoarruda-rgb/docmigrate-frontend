@@ -86,7 +86,7 @@ export function LanguageSelector({ pageId, spaceId, pageLanguage, currentLang, o
                 </span>
               )}
               {!translation && (
-                <span className="text-xs text-muted-foreground">Gerando...</span>
+                <span className="text-xs text-muted-foreground">Sem tradução</span>
               )}
               {canEdit && translation && (
                 <button

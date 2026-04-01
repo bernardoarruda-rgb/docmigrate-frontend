@@ -1,22 +1,35 @@
-import { FolderOpen, Star, Clock } from 'lucide-react'
+import { useState } from 'react'
+import { FolderOpen, Star, Clock, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { isWithinHours } from '@/lib/formatDate'
 import { useSpaces } from '@/hooks/useSpaces'
 import { useFavorites, useRecentPages } from '@/hooks/useUserActivity'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SpacePreviewCard } from '@/components/spaces/SpacePreviewCard'
+import { SpaceFormDialog } from '@/components/spaces/SpaceFormDialog'
+import { usePermissions } from '@/hooks/usePermissions'
 
-function ActivityPageCard({ title, spaceTitle, spaceId, pageId }: {
+function ActivityPageCard({ title, spaceTitle, spaceId, pageId, visitedAt }: {
   title: string
   spaceTitle: string | null
   spaceId: number
   pageId: number
+  visitedAt?: string
 }) {
+  const isNew = visitedAt ? isWithinHours(visitedAt, 24) : false
+
   return (
     <Link
       to={`/spaces/${spaceId}/pages/${pageId}`}
-      className="flex flex-col gap-1 rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors min-w-50 max-w-50"
+      className="relative flex flex-col gap-1 rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors min-w-50 max-w-50"
     >
+      {isNew && (
+        <span className="absolute -top-1.5 -right-1.5 text-[10px] font-medium bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
+          Novo
+        </span>
+      )}
       <span className="text-sm font-medium truncate">{title}</span>
       {spaceTitle && (
         <span className="text-xs text-muted-foreground truncate">{spaceTitle}</span>
@@ -30,6 +43,8 @@ export function SpaceHubPage() {
   const { data, isLoading, error } = useSpaces()
   const { data: favorites } = useFavorites()
   const { data: recentPages } = useRecentPages()
+  const { canEdit } = usePermissions()
+  const [spaceFormOpen, setSpaceFormOpen] = useState(false)
 
   if (isLoading) {
     return (
@@ -56,13 +71,22 @@ export function SpaceHubPage() {
 
   if (spaces.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
-        <div className="flex items-center justify-center h-20 w-20 rounded-3xl bg-muted mb-4">
-          <FolderOpen className="h-10 w-10" />
+      <>
+        <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
+          <div className="flex items-center justify-center h-20 w-20 rounded-3xl bg-muted mb-4">
+            <FolderOpen className="h-10 w-10" />
+          </div>
+          <p className="text-lg font-medium text-foreground">Nenhum espaco encontrado</p>
+          <p className="text-sm mt-1 mb-4">Crie seu primeiro espaco para comecar a documentar.</p>
+          {canEdit && (
+            <Button onClick={() => setSpaceFormOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Criar primeiro espaco
+            </Button>
+          )}
         </div>
-        <p className="text-lg font-medium text-foreground">Nenhum espaco encontrado</p>
-        <p className="text-sm mt-1">Crie um espaco na area de administracao para comecar.</p>
-      </div>
+        <SpaceFormDialog open={spaceFormOpen} onOpenChange={setSpaceFormOpen} />
+      </>
     )
   }
 
@@ -104,6 +128,7 @@ export function SpaceHubPage() {
                 spaceTitle={recent.spaceTitle}
                 spaceId={recent.spaceId}
                 pageId={recent.pageId}
+                visitedAt={recent.visitedAt}
               />
             ))}
           </div>

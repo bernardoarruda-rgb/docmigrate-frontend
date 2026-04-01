@@ -1,13 +1,21 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useParams, useNavigate, useBlocker } from 'react-router-dom'
 import type { JSONContent } from '@tiptap/react'
-import { ArrowLeft, Loader2, Lock } from 'lucide-react'
+import { ArrowLeft, Loader2, Lock, AlertTriangle } from 'lucide-react'
 import { usePage } from '@/hooks/usePages'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useSpace } from '@/hooks/useSpaces'
 import { useAutosave } from '@/hooks/useAutosave'
 import { useSidebar } from '@/hooks/useSidebar'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { RichTextEditor } from '@/components/editor/RichTextEditor'
 import { ENDPOINTS } from '@/config/endpoints'
 import { getToken } from '@/lib/authStore'
@@ -28,6 +36,21 @@ export function PageEditPage() {
   const [content, setContent] = useState<JSONContent | null>(null)
   const [lockAcquired, setLockAcquired] = useState(false)
   const [lockError, setLockError] = useState<string | null>(null)
+  const intentionalNavRef = useRef(false)
+
+  // Block navigation when there are unsaved changes
+  const hasUnsavedChanges = saveStatus === 'unsaved' || saveStatus === 'saving'
+  const blocker = useBlocker(() => hasUnsavedChanges && !intentionalNavRef.current)
+
+  // Warn on tab close with unsaved changes
+  useEffect(() => {
+    if (!hasUnsavedChanges) return
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [hasUnsavedChanges])
 
   // Hide sidebar on mount, restore on unmount
   useEffect(() => {
@@ -98,6 +121,7 @@ export function PageEditPage() {
 
   // Navigate back after explicitly releasing the lock (ensures version creation)
   const handleBack = useCallback(async () => {
+    intentionalNavRef.current = true
     await releaseLock()
     navigate(`/spaces/${numSpaceId}/pages/${id}`)
   }, [releaseLock, navigate, numSpaceId, id])
@@ -195,6 +219,29 @@ export function PageEditPage() {
           pageContent={page.content}
         />
       </div>
+
+      {/* Unsaved changes blocker dialog */}
+      <Dialog open={blocker.state === 'blocked'} onOpenChange={() => blocker.reset?.()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              Alteracoes nao salvas
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Voce tem alteracoes que ainda nao foram salvas. Deseja sair sem salvar?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => blocker.reset?.()}>
+              Continuar editando
+            </Button>
+            <Button variant="destructive" onClick={() => blocker.proceed?.()}>
+              Sair sem salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

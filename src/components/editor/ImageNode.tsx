@@ -4,6 +4,7 @@ import type { NodeViewProps } from '@tiptap/react'
 import { ImageIcon, Trash2, Upload, Link } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ImageLightbox } from '@/components/ui/image-lightbox'
 import { buildStyleObject } from './utils/styleUtils'
 import { useUploadImage } from '@/hooks/useFileUpload'
 import { IMAGE_UPLOAD } from '@/config/constants'
@@ -24,6 +25,7 @@ const ImageNode = memo(function ImageNode({
   const [error, setError] = useState(false)
   const [activeTab, setActiveTab] = useState<TabMode>('upload')
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadImage = useUploadImage()
 
@@ -211,10 +213,11 @@ const ImageNode = memo(function ImageNode({
           <img
             src={src}
             alt={alt ?? ''}
-            className="max-w-full rounded-lg"
+            className={`max-w-full rounded-lg${!isEditable ? ' cursor-zoom-in' : ''}`}
             loading="lazy"
             decoding="async"
             onError={() => setError(true)}
+            onClick={!isEditable ? () => setLightboxOpen(true) : undefined}
           />
         ) : (
           <div className="flex items-center gap-2 rounded-lg border border-destructive bg-destructive/10 p-4 text-sm text-destructive">
@@ -232,6 +235,14 @@ const ImageNode = memo(function ImageNode({
           </button>
         )}
       </div>
+      {!isEditable && (
+        <ImageLightbox
+          src={src}
+          alt={alt ?? undefined}
+          open={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
       {alt && (
         <figcaption className="mt-1 text-center text-xs text-muted-foreground">
           {alt}

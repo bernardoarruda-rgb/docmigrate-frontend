@@ -247,4 +247,135 @@ export const SLASH_COMMANDS: SlashCommandItem[] = [
         .run()
     },
   },
+  {
+    title: 'Grid de Cards',
+    description: '3 cards em colunas',
+    icon: 'LayoutGrid',
+    command: ({ editor, range }) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertContent({
+          type: 'columns',
+          attrs: { count: 3 },
+          content: [
+            {
+              type: 'column',
+              content: [
+                {
+                  type: 'cardBlock',
+                  attrs: { variant: 'bordered' },
+                  content: [
+                    { type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: 'Tópico A' }] },
+                    { type: 'paragraph', content: [{ type: 'text', text: 'Descrição breve deste tópico.' }] },
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'column',
+              content: [
+                {
+                  type: 'cardBlock',
+                  attrs: { variant: 'bordered' },
+                  content: [
+                    { type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: 'Tópico B' }] },
+                    { type: 'paragraph', content: [{ type: 'text', text: 'Descrição breve deste tópico.' }] },
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'column',
+              content: [
+                {
+                  type: 'cardBlock',
+                  attrs: { variant: 'bordered' },
+                  content: [
+                    { type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: 'Tópico C' }] },
+                    { type: 'paragraph', content: [{ type: 'text', text: 'Descrição breve deste tópico.' }] },
+                  ],
+                },
+              ],
+            },
+          ],
+        })
+        .run()
+    },
+  },
+  {
+    title: 'Imagem + Texto',
+    description: 'Conteudo lado a lado com imagem',
+    icon: 'PanelLeftClose',
+    command: ({ editor, range }) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertContent({
+          type: 'columns',
+          attrs: { count: 2 },
+          content: [
+            {
+              type: 'column',
+              content: [
+                { type: 'image', attrs: { src: '', alt: 'Imagem ilustrativa' } },
+              ],
+            },
+            {
+              type: 'column',
+              content: [
+                { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'Sobre este tópico' }] },
+                { type: 'paragraph', content: [{ type: 'text', text: 'Explique o contexto e os detalhes relevantes.' }] },
+              ],
+            },
+          ],
+        })
+        .run()
+    },
+  },
+  {
+    title: 'FAQ',
+    description: 'Perguntas frequentes com acordeao',
+    icon: 'HelpCircle',
+    command: ({ editor, range }) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertContent([
+          { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'Perguntas Frequentes' }] },
+          {
+            type: 'accordion',
+            content: [
+              {
+                type: 'accordionItem',
+                attrs: { title: 'Como funciona?', isOpen: true },
+                content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Explique o funcionamento aqui.' }] }],
+              },
+              {
+                type: 'accordionItem',
+                attrs: { title: 'Quem pode usar?', isOpen: false },
+                content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Descreva quem tem acesso.' }] }],
+              },
+              {
+                type: 'accordionItem',
+                attrs: { title: 'Onde encontro mais informações?', isOpen: false },
+                content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Indique referências e links úteis.' }] }],
+              },
+            ],
+          },
+        ])
+        .run()
+    },
+  },
+  {
+    title: 'Tabela',
+    description: 'Tabela com cabecalho',
+    icon: 'Table',
+    command: ({ editor, range }) => {
+      editor.chain().focus().deleteRange(range).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+    },
+  },
 ]
